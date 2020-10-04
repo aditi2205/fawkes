@@ -35,6 +35,27 @@ def dump_json(records, write_file):
     with open(write_file, "w") as file:
         json.dump(records, file, indent=4)
 
+def write_query_results(function_name, response, write_file):
+    method_mapping = {'write_query_results_json': write_query_results_json,
+                      'write_query_results_csv': write_query_results_csv}
+    if function_name in method_mapping:
+        method_mapping[function_name](response, write_file)
+
+def write_query_results_json(response, write_file):
+    with open(write_file, "w+") as file:
+        json.dump(response, file, indent=4)
+
+def write_query_results_csv(response, write_file):
+    #Get the column values from query response
+    field_names = json.loads(json.dumps(response))
+    field_names = list(field_names.keys())
+
+    #Write the value corresponding to above columns in csv file
+    with open(write_file, 'w+') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames = field_names)
+        writer.writeheader()
+        writer.writerow(response)
+
 def get_json_key_value(json_object, keys_list):
     """ Get the value from json pointing to string of keys input: [k1,k2] """
     # This will be the key
