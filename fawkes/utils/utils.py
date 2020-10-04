@@ -139,24 +139,16 @@ def fetch_channel_config(app_config, channel_type):
             return review_channel
     return None
 
-def write_query_results(function_name, response, write_file):
-    method_mapping = {'write_query_results_json': write_query_results_json,
-                      'write_query_results_csv': write_query_results_csv}
-    if function_name in method_mapping:
-        method_mapping[function_name](response, write_file)
-
-def write_query_results_json(response, write_file):
-    with open(write_file, "w+") as file:
-        json.dump(response, file, indent=4)
-
-def write_query_results_csv(response, write_file):
-    #Get the column values from query response
-    field_names = json.loads(json.dumps(response))
-    field_names = list(field_names.keys())
-
-    #Write the value corresponding to above columns in csv file
-    with open(write_file, 'w+') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames = field_names)
-        writer.writeheader()
-        writer.writerow(response)
-
+def write_query_results(response, write_file, format):
+    if format == "json":
+        with open(write_file, "w+") as file:
+            json.dump(response, file, indent=4)
+    elif format == "csv":
+        #Get the column values from query response
+        field_names = json.loads(json.dumps(response))
+        field_names = list(field_names.keys())
+        #Write the value corresponding to above columns in csv file
+        with open(write_file, 'w+') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=field_names)
+            writer.writeheader()
+            writer.writerow(response)

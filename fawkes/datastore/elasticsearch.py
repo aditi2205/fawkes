@@ -146,9 +146,10 @@ def push_data_to_elasticsearch():
                       response.text)
             i += 1
     #TODO: Remove this comment
-    query_search(app_config.elastic_config.elastic_search_url , app_config, "json", app_config.elastic_config.index)
+    query_search(app_config.elastic_config.elastic_search_url , app_config, app_config.elastic_config.index, "csv")
 
-def query_search(elastic_search_url, app_config, format, query_term=""):
+# Default format is json unless csv mentioned explicitly
+def query_search(elastic_search_url, app_config, query_term="", format="json"):
     if query_term is "":
         endpoint = elastic_search_url + "_search"
     else:
@@ -161,8 +162,7 @@ def query_search(elastic_search_url, app_config, format, query_term=""):
         app_name=app_config.app.name,
         extension=format
     )
-    utils.write_query_results(constants.WRITE_QUERY_RESULTS_FUNCTION_NAME.format(file_type=format),
-                              results, query_response_file)
+    utils.write_query_results(results, query_response_file, format)
     return results
 
 
