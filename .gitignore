@@ -29,6 +29,7 @@ data/**/*.html
 !data/raw_data/sample-mint/*
 !data/parsed_data/sample-mint/*
 !data/processed_data/sample-mint/*
+!data/query_response_data/sample-mint/*
 
 # Code coverage
 .coverage
