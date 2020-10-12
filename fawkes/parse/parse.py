@@ -12,9 +12,10 @@ from pprint import pprint
 sys.path.append(os.path.realpath("."))
 
 import fawkes.utils.utils as utils
-import fawkes.constants as constants
+import fawkes.constants.constants as constants
 
-from fawkes.app_config.app_config import AppConfig, ReviewChannelTypes
+from fawkes.configs.app_config import AppConfig, ReviewChannelTypes
+from fawkes.configs.fawkes_config import FawkesConfig
 from fawkes.review.review import Review
 
 def parse_csv(raw_user_reviews_file_path, review_channel, app_config):
@@ -78,9 +79,12 @@ def parse_json(raw_user_reviews_file_path, review_channel, app_config):
     parsed_reviews = []
 
     for review in reviews:
-        # TODO: Conver this to a standard format like jsonpath
+        # TODO: Conver this to a standard format like jsonpath.
+        # Extract the message.
         message = utils.get_json_key_value(review, review_channel.message_key.split("."))
+        # Extract the timestamp.
         timestamp = utils.get_json_key_value(review, review_channel.timestamp_key.split("."))
+        # Extract the rating if present.
         rating = None
         if review_channel.rating_key != None:
             rating = utils.get_json_key_value(review, review_channel.rating_key.split("."))
@@ -102,13 +106,46 @@ def parse_json(raw_user_reviews_file_path, review_channel, app_config):
 
     return parsed_reviews
 
+def parse_json_lines(raw_user_reviews_file_path, review_channel, app_config):
+    parsed_reviews = []
+    with open(raw_user_reviews_file_path, "r") as raw_user_reviews_file_handle:
+        # We read the file line by line as each line is a valid json string. https://jsonlines.org/
+        for line in raw_user_reviews_file_handle:
+            review = json.loads(line)
+            # TODO: Conver this to a standard format like jsonpath.
+            # Extract the message.
+            message = utils.get_json_key_value(review, review_channel.message_key.split("."))
+            # Extract the timestamp.
+            timestamp = utils.get_json_key_value(review, review_channel.timestamp_key.split("."))
+            # Extract the rating if present.
+            rating = None
+            if review_channel.rating_key != None:
+                rating = utils.get_json_key_value(review, review_channel.rating_key.split("."))
 
-def parse_reviews():
-    # Read all the app-config file names
-    app_configs = utils.open_json(
-        constants.APP_CONFIG_FILE.format(file_name=constants.APP_CONFIG_FILE_NAME)
+            # Add the review object to the parsed reviews
+            parsed_reviews.append(
+                Review(
+                    review,
+                    message=message,
+                    timestamp=timestamp,
+                    rating=rating,
+                    app_name=app_config.app.name,
+                    channel_name=review_channel.channel_name,
+                    channel_type=review_channel.channel_type,
+                    review_timezone=review_channel.timezone,
+                    timestamp_format=review_channel.timestamp_format,
+                )
+            )
+    return parsed_reviews
+
+def parse_reviews(fawkes_config_file = constants.FAWKES_CONFIG_FILE):
+    # Read the app-config.json file.
+    fawkes_config = FawkesConfig(
+        utils.open_json(fawkes_config_file)
     )
-    for app_config_file in app_configs:
+    # For every app registered in app-config.json we
+    for app_config_file in fawkes_config.apps:
+        # Creating an AppConfig object
         app_config = AppConfig(
             utils.open_json(
                 app_config_file
@@ -133,6 +170,12 @@ def parse_reviews():
                     )
                 elif review_channel.file_type == constants.CSV: # Parse CSV
                     channel_reviews = parse_csv(
+                        raw_user_reviews_file_path,
+                        review_channel,
+                        app_config
+                    )
+                elif review_channel.file_type == constants.JSON_LINES:
+                    channel_reviews = parse_json_lines(
                         raw_user_reviews_file_path,
                         review_channel,
                         app_config
@@ -166,7 +209,3 @@ def parse_reviews():
             [parsed_review.to_dict() for parsed_review in parsed_reviews],
             parsed_user_reviews_file_path
         )
-
-
-if __name__ == "__main__":
-    parse_reviews()

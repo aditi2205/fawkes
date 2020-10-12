@@ -15,7 +15,7 @@ storages.json
 app/*.csv
 app/*.json
 app/*.py
-!app/app-config.json
+!app/fawkes-config.json
 !app/bug-feature-keywords.json
 !app/category-keywords.json
 
@@ -37,5 +37,13 @@ coverage.xml
 
 # All the binaries including elasticsearch, kibana etc.
 bin/
+lib/
+pyvenv.cfg
 
+# Documentation
 docs/
+
+# PyInstaller related stuff
+cli.spec
+build/
+dist/

@@ -133,6 +133,7 @@ class ReviewChannelTypes:
     CSV = "csv"
     JSON = "json"
     BLANK = "blank"
+    REMOTE_FILE = "remote_file"
 
 class ReviewChannel:
     """ Definition of a Review Channel.
@@ -297,7 +298,7 @@ class FawkesInternalConfig:
         self.data = FawkesInternalDataConfig(config["data"])
 
 class AppConfig:
-    """ The configuration for running Fawkes.
+    """ The configuration for running Fawkes for a particular app.
 
 
 Definition of a Review Channel.

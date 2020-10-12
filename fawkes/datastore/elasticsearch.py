@@ -11,9 +11,10 @@ sys.path.append(os.path.realpath("."))
 
 import fawkes.utils.utils as utils
 import fawkes.utils.filter_utils as filter_utils
-import fawkes.constants as constants
+import fawkes.constants.constants as constants
 
-from fawkes.app_config.app_config import AppConfig
+from fawkes.configs.app_config import AppConfig
+from fawkes.configs.fawkes_config import FawkesConfig
 from fawkes.review.review import Review
 
 def create_index(elastic_search_url, index):
@@ -86,11 +87,14 @@ def bulk_push_to_elastic(elastic_search_url, index, reviews):
     return response
 
 
-def push_data_to_elasticsearch():
-    app_configs = utils.open_json(
-        constants.APP_CONFIG_FILE.format(file_name=constants.APP_CONFIG_FILE_NAME)
+def push_data_to_elasticsearch(fawkes_config_file = constants.FAWKES_CONFIG_FILE):
+    # Read the app-config.json file.
+    fawkes_config = FawkesConfig(
+        utils.open_json(fawkes_config_file)
     )
-    for app_config_file in app_configs:
+    # For every app registered in app-config.json we
+    for app_config_file in fawkes_config.apps:
+        # Creating an AppConfig object
         app_config = AppConfig(
             utils.open_json(
                 app_config_file
@@ -145,15 +149,24 @@ def push_data_to_elasticsearch():
                 print("[Error] push_data_to_elasticsearch :: Response is : ",
                       response.text)
             i += 1
-    #TODO: Remove this comment
-    query_search(app_config.elastic_config.elastic_search_url , app_config, app_config.elastic_config.index, "csv")
 
-# Default format is json unless csv mentioned explicitly
-def query_search(elastic_search_url, app_config, query_term="", format="json"):
-    if query_term is "":
-        endpoint = elastic_search_url + "_search"
+def query_from_elasticsearch(fawkes_config_file = constants.FAWKES_CONFIG_FILE, query_term="", format=constants.JSON):
+    fawkes_config = FawkesConfig(
+        utils.open_json(fawkes_config_file)
+    )
+    # For every app registered in app-config.json we
+    for app_config_file in fawkes_config.apps:
+        # Creating an AppConfig object
+        app_config = AppConfig(
+            utils.open_json(
+                app_config_file
+            )
+        )
+
+    if query_term == "":
+        endpoint = app_config.elastic_config.elastic_search_url + "_"+constants.SEARCH
     else:
-        endpoint = elastic_search_url + query_term + "/"+"_search"
+        endpoint = app_config.elastic_config.elastic_search_url + query_term + "/"+"_"+constants.SEARCH
     response = requests.get(endpoint)
     results = json.loads(response.text)
     query_response_file = constants.ELASTICSEARCH_FETCH_DATA_FILE_PATH.format(
@@ -164,7 +177,6 @@ def query_search(elastic_search_url, app_config, query_term="", format="json"):
     )
     utils.write_query_results(results, query_response_file, format)
     return results
-
 
 if __name__ == "__main__":
     push_data_to_elasticsearch()

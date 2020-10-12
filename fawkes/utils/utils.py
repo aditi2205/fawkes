@@ -1,5 +1,4 @@
 import json
-import ast
 import sys
 import os
 import re
@@ -9,21 +8,19 @@ import operator
 import dateutil.parser
 import hashlib
 
-import gensim
 import spacy
 import jsonschema
 
 from pprint import pprint
 from datetime import datetime, timedelta
 
-from gensim.utils import simple_preprocess
 from nltk.corpus import stopwords
 
 #  This is so that the following imports work
 sys.path.append(os.path.realpath("."))
 
-import fawkes.constants as constants
-from fawkes.stop_words_file import EXTENDED_STOP_WORDS
+import fawkes.constants.constants as constants
+from fawkes.constants.stop_words import EXTENDED_STOP_WORDS
 
 def open_json(file_location):
     with open(file_location, "r") as read_file:
@@ -74,11 +71,6 @@ def check_for_explicit_content(tweet):
     if constants.POSSIBLY_SENSITIVE in tweet:
         return tweet[constants.POSSIBLY_SENSITIVE]
     return True
-
-
-def tokenise(document):
-    return gensim.utils.simple_preprocess(str(document), deacc=True)
-
 
 def remove_stop_words(document):
     """
