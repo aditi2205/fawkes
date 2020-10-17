@@ -56,18 +56,34 @@ def define_arguments(parser):
         type=str,
         default=constants.FAWKES_CONFIG_FILE,
     )
+    # Specify query index for elasticsearch query
+    parser.add_argument(
+        "-q", "--query",
+        help="The query index for elasticSearch query",
+        type=str,
+        default="fawkes-user-reviews",
+    )
+    # Specify response file format for elasticsearch query
+    parser.add_argument(
+        "-f", "--format",
+        help="The response file format for elasticSearch query",
+        type=str,
+        default=constants.JSON,
+    )
 
 if __name__ == "__main__":
     # Init the arg parser
     parser = argparse.ArgumentParser()
     # Defining all the arguments
     define_arguments(parser)
-    # Extracting all the alruments
+    # Extracting all the arguments
     args = parser.parse_args()
 
     # Depending on the args, we execute the commands.
     action = args.action
     app_config_file = args.config
+    query_term = args.query
+    query_response_file_format = args.format
 
     if action == FawkesActions.FETCH:
         fetch.fetch_reviews(app_config_file)
@@ -82,7 +98,7 @@ if __name__ == "__main__":
     elif action == FawkesActions.PUSH_ELASTICSEARCH:
         elasticsearch.push_data_to_elasticsearch(app_config_file)
     elif action == FawkesActions.QUERY_ELASTICSEARCH:
-        elasticsearch.query_from_elasticsearch(app_config_file)
+        elasticsearch.query_from_elasticsearch(app_config_file, query_term=query_term, format=query_response_file_format)
     elif action == FawkesActions.PUSH_SLACK:
         slackbot.send_reviews_to_slack(app_config_file)
     elif action == FawkesActions.GENERATE_TEXT_MATCH_KEYWORDS:

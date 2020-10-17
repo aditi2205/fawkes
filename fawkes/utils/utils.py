@@ -132,10 +132,10 @@ def fetch_channel_config(app_config, channel_type):
     return None
 
 def write_query_results(response, write_file, format):
-    if format == "json":
+    if format == constants.JSON:
         with open(write_file, "w+") as file:
             json.dump(response, file, indent=4)
-    elif format == "csv":
+    elif format == constants.CSV:
         #Get the column values from query response
         field_names = json.loads(json.dumps(response))
         field_names = list(field_names.keys())
