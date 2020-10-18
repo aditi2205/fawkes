@@ -164,9 +164,9 @@ def query_from_elasticsearch(fawkes_config_file = constants.FAWKES_CONFIG_FILE, 
         )
 
     if query_term == "":
-        endpoint = app_config.elastic_config.elastic_search_url + "_"+constants.SEARCH
+        endpoint = app_config.elastic_config.elastic_search_url + "_" + constants.SEARCH
     else:
-        endpoint = app_config.elastic_config.elastic_search_url + query_term + "/"+"_"+constants.SEARCH
+        endpoint = app_config.elastic_config.elastic_search_url + query_term + "/" + "_" + constants.SEARCH
     response = requests.get(endpoint)
     results = json.loads(response.text)
     query_response_file = constants.ELASTICSEARCH_FETCH_DATA_FILE_PATH.format(

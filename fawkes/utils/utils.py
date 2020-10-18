@@ -133,14 +133,14 @@ def fetch_channel_config(app_config, channel_type):
 
 def write_query_results(response, write_file, format):
     if format == constants.JSON:
-        with open(write_file, "w+") as file:
-            json.dump(response, file, indent=4)
+        with open(write_file, "w") as file:
+            json.dump(response, file, indent = 4)
     elif format == constants.CSV:
         #Get the column values from query response
         field_names = json.loads(json.dumps(response))
         field_names = list(field_names.keys())
         #Write the value corresponding to above columns in csv file
-        with open(write_file, 'w+') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=field_names)
+        with open(write_file, 'w') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames = field_names)
             writer.writeheader()
             writer.writerow(response)

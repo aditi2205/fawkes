@@ -98,7 +98,7 @@ if __name__ == "__main__":
     elif action == FawkesActions.PUSH_ELASTICSEARCH:
         elasticsearch.push_data_to_elasticsearch(app_config_file)
     elif action == FawkesActions.QUERY_ELASTICSEARCH:
-        elasticsearch.query_from_elasticsearch(app_config_file, query_term=query_term, format=query_response_file_format)
+        elasticsearch.query_from_elasticsearch(app_config_file, query_term = query_term, format = query_response_file_format)
     elif action == FawkesActions.PUSH_SLACK:
         slackbot.send_reviews_to_slack(app_config_file)
     elif action == FawkesActions.GENERATE_TEXT_MATCH_KEYWORDS:
