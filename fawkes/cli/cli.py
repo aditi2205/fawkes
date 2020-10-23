@@ -61,7 +61,7 @@ def define_arguments(parser):
         "-q", "--query",
         help="The query index for elasticsearch query",
         type=str,
-        default="None",
+        default="",
     )
     # Specify response file format for elasticsearch query
     parser.add_argument(
