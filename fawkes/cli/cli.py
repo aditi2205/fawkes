@@ -59,9 +59,9 @@ def define_arguments(parser):
     # Specify query index for elasticsearch query
     parser.add_argument(
         "-q", "--query",
-        help="The query index for elasticSearch query",
+        help="The query index for elasticsearch query",
         type=str,
-        default="fawkes-user-reviews",
+        default="None",
     )
     # Specify response file format for elasticsearch query
     parser.add_argument(

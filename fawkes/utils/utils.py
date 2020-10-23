@@ -15,6 +15,7 @@ from pprint import pprint
 from datetime import datetime, timedelta
 
 from nltk.corpus import stopwords
+from pathlib import Path
 
 #  This is so that the following imports work
 sys.path.append(os.path.realpath("."))
@@ -132,6 +133,13 @@ def fetch_channel_config(app_config, channel_type):
     return None
 
 def write_query_results(response, write_file, format):
+    # Create the directory structure if does not exists else pass
+    try:
+        # Split the response file path to get directory
+        query_response_directory_path = os.path.split(write_file)
+        Path(query_response_directory_path[0]).mkdir(parents=True, exist_ok=True)
+    except FileExistsError:
+        pass
     if format == constants.JSON:
         with open(write_file, "w") as file:
             json.dump(response, file, indent = 4)
