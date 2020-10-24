@@ -33,6 +33,15 @@ def dump_json(records, write_file):
     with open(write_file, "w") as file:
         json.dump(records, file, indent=4)
 
+def dump_csv(records, write_file):
+    #Get the column values from query response
+    field_names = list(records.keys())
+    #Write the value corresponding to above columns in csv file
+    with open(write_file, 'w') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=field_names)
+        writer.writeheader()
+        writer.writerow(records)
+
 def get_json_key_value(json_object, keys_list):
     """ Get the value from json pointing to string of keys input: [k1,k2] """
     # This will be the key
@@ -133,22 +142,10 @@ def fetch_channel_config(app_config, channel_type):
     return None
 
 def write_query_results(response, write_file, format):
-    # Create the directory structure if does not exists else pass
-    try:
-        # Split the response file path to get directory
-        query_response_directory_path = os.path.split(write_file)
-        Path(query_response_directory_path[0]).mkdir(parents=True, exist_ok=True)
-    except FileExistsError:
-        pass
+    # Create the intermediate folders
+    dir_name = os.path.dirname(write_file)
+    Path(dir_name).mkdir(parents=True, exist_ok=True)
     if format == constants.JSON:
-        with open(write_file, "w") as file:
-            json.dump(response, file, indent = 4)
+        dump_json(response, write_file)
     elif format == constants.CSV:
-        #Get the column values from query response
-        field_names = json.loads(json.dumps(response))
-        field_names = list(field_names.keys())
-        #Write the value corresponding to above columns in csv file
-        with open(write_file, 'w') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames = field_names)
-            writer.writeheader()
-            writer.writerow(response)
+        dump_csv(response, write_file)
